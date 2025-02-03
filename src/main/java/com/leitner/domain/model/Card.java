@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "cards")
 public class Card {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incrémentation
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String question;
