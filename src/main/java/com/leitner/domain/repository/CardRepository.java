@@ -11,4 +11,6 @@ import java.util.List;
 public interface CardRepository extends JpaRepository<Card, Integer> {
 
     List<Card> findByCategory(Category category);
+
+    List<Card> findByTag(String tag);
 }

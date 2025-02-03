@@ -67,6 +67,22 @@ class CardRepositoryTest {
     }
 
     @Test
+    void shouldFindCardsByTag() {
+        // Given
+        Card card1 = new Card(1, "Q1", "A1", "Tag1", Category.FIRST);
+        Card card2 = new Card(2, "Q2", "A2", "Tag2", Category.SECOND);
+        cardRepository.save(card1);
+        cardRepository.save(card2);
+
+        // When
+        List<Card> firstCategoryCards = cardRepository.findByTag("Tag1");
+
+        // Then
+        assertEquals(1, firstCategoryCards.size());
+        assertEquals(Category.FIRST, firstCategoryCards.getFirst().getCategory());
+    }
+
+    @Test
     void shouldDeleteCard() {
         // Given
         Card card = new Card(1, "Question?", "Answer", "Tag", Category.FIRST);
