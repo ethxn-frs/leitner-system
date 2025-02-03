@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,9 @@ import java.util.List;
 @RequestMapping("/cards")
 @Tag(name = "Cards", description = "Gestion des fiches Leitner")
 public class CardController {
-    private final CardService cardService;
 
-    public CardController(CardService cardService) {
-        this.cardService = cardService;
-    }
+    @Autowired
+    private CardService cardService;
 
     @Operation(summary = "Récupère toutes les cartes", description = "Retourne les cartes filtrées par tag si fourni.")
     @GetMapping
