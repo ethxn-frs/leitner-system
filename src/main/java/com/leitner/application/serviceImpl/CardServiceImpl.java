@@ -56,4 +56,26 @@ public class CardServiceImpl implements CardService {
         }
         throw new RuntimeException("Card not found");
     }
+
+    @Override
+    public List<Card> getCardsForQuizz(String date) {
+        //TODO : replace
+        return cardRepository.findAll();
+    }
+
+    @Override
+    public void answerCard(Integer id, boolean isValid) {
+        Optional<Card> cardOpt = cardRepository.findById(id);
+        if (cardOpt.isPresent()) {
+            Card card = cardOpt.get();
+            if (isValid) {
+                card.setCategory(Category.values()[Math.min(card.getCategory().ordinal() + 1, Category.values().length - 1)]);
+            } else {
+                card.setCategory(Category.FIRST);
+            }
+            cardRepository.save(card);
+        } else {
+            throw new RuntimeException("Card not found");
+        }
+    }
 }

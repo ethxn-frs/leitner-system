@@ -21,4 +21,8 @@ public interface CardService {
     void deleteCard(Integer id);
 
     Card updateCardCategory(Integer id, Category newCategory);
+
+    List<Card> getCardsForQuizz(String date);
+
+    void answerCard(Integer id, boolean isValid);
 }
