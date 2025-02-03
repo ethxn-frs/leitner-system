@@ -22,16 +22,25 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
+
+    @Override
+    public User getUserById(Long id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.orElse(null);
+    }
+
+    @Override
     public User createUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
+    @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public User updateUser(Integer userId, User updatedUser) {
+    public User updateUser(Long userId, User updatedUser) {
         Optional<User> existingUser = userRepository.findById(userId);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
@@ -45,7 +54,7 @@ public class UserServiceImpl implements UserService {
         throw new RuntimeException("Utilisateur non trouvé");
     }
 
-    public void deleteUser(Integer userId) {
+    public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 

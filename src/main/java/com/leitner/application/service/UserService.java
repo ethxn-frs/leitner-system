@@ -7,13 +7,15 @@ import java.util.List;
 public interface UserService {
 
 
+    User getUserById(Long id);
+
     User createUser(User user);
 
     List<User> getAllUsers();
 
-    User updateUser(Integer userId, User user);
+    User updateUser(Long userId, User user);
 
-    void deleteUser(Integer userId);
+    void deleteUser(Long userId);
 
     String authenticate(String email, String password);
 }
