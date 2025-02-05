@@ -5,100 +5,106 @@ import com.leitner.domain.model.Category;
 import com.leitner.domain.repository.CardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
+@Transactional
 class CardServiceImplTest {
 
-    @Mock
+    @Autowired
     private CardRepository cardRepository;
 
-    @InjectMocks
+    @Autowired
     private CardServiceImpl cardService;
 
-    private Card testCard;
+    private UUID testId;
 
     @BeforeEach
     void setUp() {
-        testCard = new Card(1, "Sample Question", "Sample Answer", "Sample Tag", Category.FIRST);
+        Card testCard = new Card("Sample Question", "Sample Answer", "Sample Tag", Category.FIRST);
+        testCard = cardRepository.save(testCard);
+        testId = testCard.getId();
     }
 
     @Test
     void shouldReturnAllCards() {
-        // Given
-        when(cardRepository.findAll()).thenReturn(List.of(testCard));
-
         // When
         List<Card> cards = cardService.getAllCards();
 
         // Then
-        assertEquals(1, cards.size());
-        verify(cardRepository, times(1)).findAll();
+        assertFalse(cards.isEmpty());
+        assertEquals(4, cards.size());
     }
 
     @Test
     void shouldReturnCardById() {
-        // Given
-        when(cardRepository.findById(1)).thenReturn(Optional.of(testCard));
-
         // When
-        Optional<Card> card = cardService.getCardById(1);
+        Card card = cardService.getCardById(testId);
 
         // Then
-        assertTrue(card.isPresent());
-        assertEquals(testCard.getId(), card.get().getId());
-        verify(cardRepository, times(1)).findById(1);
+        assertNotNull(card);
+        assertEquals(testId, card.getId());
     }
 
     @Test
     void shouldCreateCard() {
         // Given
-        when(cardRepository.save(testCard)).thenReturn(testCard);
+        Card newCard = new Card("New Question", "New Answer", "New Tag", Category.SECOND);
 
         // When
-        Card createdCard = cardService.createCard(testCard);
+        Card createdCard = cardService.createCard(newCard);
 
         // Then
         assertNotNull(createdCard);
-        assertEquals(testCard.getId(), createdCard.getId());
-        verify(cardRepository, times(1)).save(testCard);
+        assertNotNull(createdCard.getId());
+        assertEquals("New Question", createdCard.getQuestion());
     }
 
     @Test
     void shouldDeleteCard() {
-        // Given
-        doNothing().when(cardRepository).deleteById(1);
-
         // When
-        cardService.deleteCard(1);
+        cardService.deleteCard(testId);
 
         // Then
-        verify(cardRepository, times(1)).deleteById(1);
+        assertFalse(cardRepository.existsById(testId));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeletingNonExistentCard() {
+        // Given
+        UUID randomId = UUID.randomUUID();
+
+        // When & Then
+        assertThrows(RuntimeException.class, () -> cardService.deleteCard(randomId));
     }
 
     @Test
     void shouldUpdateCardCategory() {
-        // Given
-        when(cardRepository.findById(1)).thenReturn(Optional.of(testCard));
-        when(cardRepository.save(any(Card.class))).thenReturn(testCard);
-
         // When
-        Card updatedCard = cardService.updateCardCategory(1, Category.SECOND);
+        Card updatedCard = cardService.updateCardCategory(testId, Category.SECOND);
 
         // Then
         assertNotNull(updatedCard);
         assertEquals(Category.SECOND, updatedCard.getCategory());
-        verify(cardRepository, times(1)).findById(1);
-        verify(cardRepository, times(1)).save(any(Card.class));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNonExistentCard() {
+        // Given
+        UUID randomId = UUID.randomUUID();
+
+        // When & Then
+        assertThrows(RuntimeException.class, () -> cardService.updateCardCategory(randomId, Category.SECOND));
     }
 }
-

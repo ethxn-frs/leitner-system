@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -44,17 +44,16 @@ class CardRepositoryTest {
         assertEquals(card.getId(), found.get().getId());
     }
 
-
     @Test
     void shouldReturnEmptyIfCardNotFound() {
         // Given
-        Integer randomId = (1);
+        UUID randomId = UUID.randomUUID();
 
         // When
-        Optional<Card> found = cardRepository.findById(1);
+        Optional<Card> found = cardRepository.findById(randomId);
 
         // Then
-        assertTrue(found.isEmpty());
+        assertFalse(found.isPresent());
     }
 
     @Test
@@ -70,7 +69,7 @@ class CardRepositoryTest {
 
         // Then
         assertEquals(1, firstCategoryCards.size());
-        assertEquals(Category.FIRST, firstCategoryCards.getFirst().getCategory());
+        assertEquals(Category.FIRST, firstCategoryCards.get(0).getCategory());
     }
 
     @Test
@@ -82,11 +81,11 @@ class CardRepositoryTest {
         cardRepository.save(card2);
 
         // When
-        List<Card> firstCategoryCards = cardRepository.findByTag("Tag1");
+        List<Card> tag1Cards = cardRepository.findByTag("Tag1");
 
         // Then
-        assertEquals(1, firstCategoryCards.size());
-        assertEquals(Category.FIRST, firstCategoryCards.getFirst().getCategory());
+        assertEquals(1, tag1Cards.size());
+        assertEquals("Tag1", tag1Cards.get(0).getTag());
     }
 
     @Test
@@ -94,12 +93,13 @@ class CardRepositoryTest {
         // Given
         Card card = new Card("Question?", "Answer", "Tag", Category.FIRST);
         card = cardRepository.save(card);
+        UUID cardId = card.getId();
 
         // When
-        cardRepository.deleteById(card.getId());
-        Optional<Card> deletedCard = cardRepository.findById(card.getId());
+        cardRepository.deleteById(cardId);
+        Optional<Card> deletedCard = cardRepository.findById(cardId);
 
         // Then
-        assertTrue(deletedCard.isEmpty());
+        assertFalse(deletedCard.isPresent());
     }
 }

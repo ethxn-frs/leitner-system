@@ -1,7 +1,6 @@
 package com.leitner.application.service;
 
 import com.leitner.domain.model.User;
-
 import java.util.List;
 
 public interface UserService {

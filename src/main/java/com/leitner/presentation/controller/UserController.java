@@ -35,13 +35,13 @@ public class UserController {
 
     @Operation(summary = "Mettre à jour un utilisateur", description = "Modifie les informations d'un utilisateur spécifique.", responses = {@ApiResponse(responseCode = "200", description = "Utilisateur mis à jour"), @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")})
     @PatchMapping("/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable Integer userId, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User user) {
         return ResponseEntity.ok(userService.updateUser(userId, user));
     }
 
     @Operation(summary = "Supprimer un utilisateur", description = "Supprime un utilisateur de la base de données.", responses = {@ApiResponse(responseCode = "204", description = "Utilisateur supprimé"), @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé")})
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }

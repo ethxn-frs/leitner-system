@@ -39,7 +39,7 @@ class UserControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
         user = new User();
-        user.setId(1);
+        user.setId(1L);
         user.setEmail("test@example.com");
         user.setUsername("testUser");
         user.setPassword("password");
@@ -75,7 +75,7 @@ class UserControllerTest {
 
     @Test
     void shouldUpdateUser() throws Exception {
-        when(userService.updateUser(eq(1), any(User.class))).thenReturn(user);
+        when(userService.updateUser(eq(1L), any(User.class))).thenReturn(user);
 
         mockMvc.perform(patch("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -85,18 +85,18 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("test@example.com"))
                 .andDo(print());
 
-        verify(userService, times(1)).updateUser(eq(1), any(User.class));
+        verify(userService, times(1)).updateUser(eq(1L), any(User.class));
     }
 
     @Test
     void shouldDeleteUser() throws Exception {
-        doNothing().when(userService).deleteUser(1);
+        doNothing().when(userService).deleteUser(1L);
 
         mockMvc.perform(delete("/users/1"))
                 .andExpect(status().isNoContent())
                 .andDo(print());
 
-        verify(userService, times(1)).deleteUser(1);
+        verify(userService, times(1)).deleteUser(1L);
     }
 
     @Test

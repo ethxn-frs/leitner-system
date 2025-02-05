@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/cards")
@@ -80,7 +81,7 @@ public class CardController {
             }
     )
     @PatchMapping("/{cardId}/answer")
-    public ResponseEntity<Void> answerCard(@PathVariable Integer cardId, @RequestBody Boolean isValid) {
+    public ResponseEntity<Void> answerCard(@PathVariable UUID cardId, @RequestBody Boolean isValid) {
         cardService.answerCard(cardId, isValid);
         return ResponseEntity.noContent().build();
     }
