@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -22,8 +22,8 @@ public class CardServiceImpl implements CardService {
     }
 
     @Override
-    public Optional<Card> getCardById(Integer id) {
-        return cardRepository.findById(id);
+    public Card getCardById(UUID id) {
+        return cardRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -38,44 +38,49 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public Card createCard(Card card) {
+        if (card.getId() != null) {
+            throw new IllegalArgumentException("ID must be null for new cards");
+        }
         return cardRepository.save(card);
     }
 
+
     @Override
-    public void deleteCard(Integer id) {
+    public void deleteCard(UUID id) {
+        if (!cardRepository.existsById(id)) {
+            throw new RuntimeException("Card not found");
+        }
         cardRepository.deleteById(id);
     }
 
     @Override
-    public Card updateCardCategory(Integer id, Category newCategory) {
-        Optional<Card> cardOpt = cardRepository.findById(id);
-        if (cardOpt.isPresent()) {
-            Card card = cardOpt.get();
-            card.setCategory(newCategory);
-            return cardRepository.save(card);
-        }
-        throw new RuntimeException("Card not found");
+    public Card updateCardCategory(UUID id, Category newCategory) {
+        return cardRepository.findById(id)
+                .map(card -> {
+                    card.setCategory(newCategory);
+                    return cardRepository.save(card);
+                })
+                .orElseThrow(() -> new RuntimeException("Card not found"));
     }
 
     @Override
     public List<Card> getCardsForQuizz(String date) {
-        //TODO : replace
+        // TODO: Remplacer par une logique spécifique à la récupération des cartes de quizz
         return cardRepository.findAll();
     }
 
     @Override
-    public void answerCard(Integer id, boolean isValid) {
-        Optional<Card> cardOpt = cardRepository.findById(id);
-        if (cardOpt.isPresent()) {
-            Card card = cardOpt.get();
-            if (isValid) {
-                card.setCategory(Category.values()[Math.min(card.getCategory().ordinal() + 1, Category.values().length - 1)]);
-            } else {
-                card.setCategory(Category.FIRST);
-            }
-            cardRepository.save(card);
+    public void answerCard(UUID id, boolean isValid) {
+        Card card = cardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Card not found"));
+
+        if (isValid) {
+            int nextCategoryIndex = Math.min(card.getCategory().ordinal() + 1, Category.values().length - 1);
+            card.setCategory(Category.values()[nextCategoryIndex]);
         } else {
-            throw new RuntimeException("Card not found");
+            card.setCategory(Category.FIRST);
         }
+
+        cardRepository.save(card);
     }
 }

@@ -35,5 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
-.env.test
-.env
+src/test/ressources/.env.test
+src/main/resources/.env
+application-test.properties

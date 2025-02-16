@@ -4,13 +4,13 @@ import com.leitner.domain.model.Card;
 import com.leitner.domain.model.Category;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 public interface CardService {
 
     List<Card> getAllCards();
 
-    Optional<Card> getCardById(Integer id);
+    Card getCardById(UUID id);
 
     List<Card> getCardsByCategory(Category category);
 
@@ -18,11 +18,11 @@ public interface CardService {
 
     Card createCard(Card card);
 
-    void deleteCard(Integer id);
+    void deleteCard(UUID id);
 
-    Card updateCardCategory(Integer id, Category newCategory);
+    Card updateCardCategory(UUID id, Category newCategory);
 
     List<Card> getCardsForQuizz(String date);
 
-    void answerCard(Integer id, boolean isValid);
+    void answerCard(UUID id, boolean isValid);
 }

@@ -2,26 +2,27 @@ package com.leitner.presentation.controller;
 
 import com.leitner.application.service.CardService;
 import com.leitner.domain.model.Card;
+import com.leitner.domain.model.Category;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/cards")
 @Tag(name = "Cards", description = "Gestion des fiches Leitner")
 public class CardController {
-    private final CardService cardService;
 
-    public CardController(CardService cardService) {
-        this.cardService = cardService;
-    }
+    @Autowired
+    private CardService cardService;
 
     @Operation(summary = "Récupère toutes les cartes", description = "Retourne les cartes filtrées par tag si fourni.")
     @GetMapping
@@ -40,11 +41,22 @@ public class CardController {
     )
     @PostMapping
     public ResponseEntity<Card> createCard(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Détails de la carte à créer", required = true,
-                    content = @Content(schema = @Schema(implementation = Card.class)))
-            @RequestBody Card card) {
-        return ResponseEntity.status(201).body(cardService.createCard(card));
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Détails de la carte à créer", required = true,
+                    content = @Content(schema = @Schema(implementation = com.leitner.domain.dto.CardUserData.class))
+            )
+            @RequestBody com.leitner.domain.dto.CardUserData cardUserData) {
+
+        Card newCard = new Card(
+                cardUserData.getQuestion(),
+                cardUserData.getAnswer(),
+                cardUserData.getTag(),
+                Category.valueOf(cardUserData.getCategory())
+        );
+
+        return ResponseEntity.status(201).body(cardService.createCard(newCard));
     }
+
 
     @Operation(
             summary = "Récupérer les cartes pour un quiz",
@@ -81,7 +93,7 @@ public class CardController {
             }
     )
     @PatchMapping("/{cardId}/answer")
-    public ResponseEntity<Void> answerCard(@PathVariable Integer cardId, @RequestBody Boolean isValid) {
+    public ResponseEntity<Void> answerCard(@PathVariable UUID cardId, @RequestBody Boolean isValid) {
         cardService.answerCard(cardId, isValid);
         return ResponseEntity.noContent().build();
     }
