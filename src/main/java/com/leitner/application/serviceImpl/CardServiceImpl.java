@@ -38,8 +38,12 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public Card createCard(Card card) {
+        if (card.getId() != null) {
+            throw new IllegalArgumentException("ID must be null for new cards");
+        }
         return cardRepository.save(card);
     }
+
 
     @Override
     public void deleteCard(UUID id) {
