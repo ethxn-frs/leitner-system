@@ -1,5 +1,6 @@
 package com.leitner.presentation.controller;
 
+import com.leitner.application.dto.CardUserData;
 import com.leitner.application.service.CardService;
 import com.leitner.domain.model.Card;
 import com.leitner.domain.model.Category;
@@ -43,9 +44,9 @@ public class CardController {
     public ResponseEntity<Card> createCard(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Détails de la carte à créer", required = true,
-                    content = @Content(schema = @Schema(implementation = com.leitner.domain.dto.CardUserData.class))
+                    content = @Content(schema = @Schema(implementation = CardUserData.class))
             )
-            @RequestBody com.leitner.domain.dto.CardUserData cardUserData) {
+            @RequestBody CardUserData cardUserData) {
 
         Card newCard = new Card(
                 cardUserData.getQuestion(),
